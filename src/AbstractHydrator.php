@@ -59,22 +59,24 @@ abstract class AbstractHydrator implements
     {
         if (isset($this->strategies[$name])) {
             return $this->strategies[$name];
-        } elseif ($this->hasNamingStrategy()
+        }
+        
+        if ($this->hasNamingStrategy()
             && ($hydrated = $this->getNamingStrategy()->hydrate($name))
             && isset($this->strategies[$hydrated])
         ) {
             return $this->strategies[$hydrated];
         }
-
-        if (! isset($this->strategies['*'])) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s: no strategy by name of "%s", and no wildcard strategy present',
-                __METHOD__,
-                $name
-            ));
+        
+        if (isset($this->strategies['*'])) {
+            return $this->strategies['*'];
         }
 
-        return $this->strategies['*'];
+        throw new Exception\InvalidArgumentException(sprintf(
+            '%s: no strategy by name of "%s", and no wildcard strategy present',
+            __METHOD__,
+            $name
+        ));
     }
 
     /**
